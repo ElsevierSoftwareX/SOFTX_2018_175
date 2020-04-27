@@ -1,0 +1,1972 @@
+' MENU PRINCIPAL
+
+Public Class frm_Menu_Principal
+
+    Private Sub Timer1_Tick(sender As Object, e As EventArgs) Handles Timer1.Tick
+
+        If PictureBox1.Top = 20 Then
+
+            PictureBox1.Top = 20
+
+            btn_ajuda.Visible = True
+            btn_calculos.Visible = True
+            btn_sobre.Visible = True
+            btn_sair.Visible = True
+
+        Else
+            PictureBox1.Top = PictureBox1.Top + 1
+
+        End If
+
+    End Sub
+
+    Private Sub btn_calculos_Click(sender As Object, e As EventArgs) Handles btn_calculos.Click
+
+        frm_Calcula_Secao.Show()
+
+    End Sub
+
+    Private Sub btn_sair_Click(sender As Object, e As EventArgs) Handles btn_sair.Click
+
+        If MessageBox.Show("Deseja sair da aplicaçao?", "Sair", MessageBoxButtons.YesNo, MessageBoxIcon.Question) = vbYes Then
+
+            Me.Close()
+
+        End If
+
+    End Sub
+
+    Private Sub frm_Menu_Principal_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        btn_ajuda.Visible = False
+        btn_calculos.Visible = False
+        btn_sobre.Visible = False
+        btn_sair.Visible = False
+
+    End Sub
+
+    Private Sub btn_ajuda_Click(sender As Object, e As EventArgs) Handles btn_ajuda.Click
+        frm_Ajuda.Show()
+    End Sub
+
+    Private Sub btn_sobre_Click(sender As Object, e As EventArgs) Handles btn_sobre.Click
+        frm_Sobre.Show()
+    End Sub
+End Class 
+' AJUDA
+
+Public Class frm_Ajuda
+
+    Private Sub MenuPrincipalToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles MenuPrincipalToolStripMenuItem.Click
+
+        frm_Menu_Principal.Show()
+        Me.Close()
+
+    End Sub
+
+    Private Sub CálculoMomentoXDeformaçaoToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CálculoMomentoXDeformaçaoToolStripMenuItem.Click
+
+        frm_Calcula_Secao.Show()
+        Me.Close()
+
+    End Sub
+
+End Class
+ 
+' CALCULA SECAO
+
+Public Class frm_Calcula_Secao
+
+    ' ESTADIO 1
+    Public deflexao_estadio1 As Double
+
+
+    ' ESTADIO 2
+    Public eixo_ecm_estadio2(i) As Double
+    Public eixo_etm_estadio2(i) As Double
+    Public eixo_momento_estadio2(i) As Double
+    Public eixo_aco_compressao_estadio2(i) As Double
+    Public eixo_aco_tracao_estadio2(i) As Double
+    Public eixo_linha_neutra_estadio2(i) As Double
+    Public eixo_deflexao_estadio2(i) As Double
+
+    ' ESTADIO 3
+    Public eixo_ecm_estadio3(j) As Double
+    Public eixo_etm_estadio3(j) As Double
+    Public eixo_momento_estadio3(j) As Double
+    Public eixo_aco_compressao_estadio3(j) As Double
+    Public eixo_aco_tracao_estadio3(j) As Double
+    Public eixo_linha_neutra_estadio3(j) As Double
+    Public numero_linhas_estadio3 As Double
+    Public eixo_deflexao_estadio3(j) As Double
+
+    ' CONTAGEM DE LINHA
+    Public i_final As Int64
+
+    Public i As Int64
+
+    Public j As Int64
+
+    Public x As Int64
+
+
+    Private Sub btn_Calcular_Click_1(sender As Object, e As EventArgs) Handles btn_Calcular.Click
+
+        If (txt_altura.Text = "" Or txt_altura_util.Text = "" Or txt_largura.Text = "" Or txt_fck.Text = "" Or _
+                txt_aco_compressao.Text = "" Or txt_aco_tracao.Text = "" Or _
+        txt_modulo_aco.Text = "" Or txt_ftk.Text = "" Or txt_modulo_concreto.Text = "" Or txt_fy_aco.Text = "" Or _
+                   txt_comprimento_vao.Text = "") Then
+
+            MessageBox.Show("Preencha todos os campos.", "Campos Vazios", MessageBoxButtons.OK, MessageBoxIcon.Information)
+
+            If txt_altura.Text = "" Then
+
+                txt_altura.Focus()
+
+            ElseIf txt_altura_util.Text = "" Then
+
+                txt_altura_util.Focus()
+
+            ElseIf txt_largura.Text = "" Then
+
+                txt_largura.Focus()
+
+            ElseIf txt_fck.Text = "" Then
+
+                txt_fck.Focus()
+
+            ElseIf txt_aco_compressao.Text = "" Then
+
+                txt_aco_compressao.Focus()
+
+            ElseIf txt_aco_tracao.Text = "" Then
+
+                txt_aco_tracao.Focus()
+
+            ElseIf txt_modulo_aco.Text = "" Then
+
+                txt_modulo_aco.Focus()
+
+            ElseIf txt_ftk.Text = "" Then
+
+                txt_ftk.Focus()
+
+            ElseIf txt_modulo_concreto.Text = "" Then
+
+                txt_modulo_concreto.Focus()
+
+            ElseIf txt_fy_aco.Text = "" Then
+
+                txt_fy_aco.Focus()
+
+            ElseIf txt_comprimento_vao.Text = "" Then
+
+                txt_comprimento_vao.Focus()
+
+            End If
+
+        End If
+
+        ' Verifica se todos os campos estao preenchidos e recebe os valores de calculo
+
+        If (txt_altura.Text <> "" And txt_altura_util.Text <> "" And txt_largura.Text <> "" And txt_fck.Text <> "" And _
+                txt_aco_compressao.Text <> "" And txt_aco_tracao.Text <> "" And _
+        txt_modulo_aco.Text <> "" And txt_ftk.Text <> "" And txt_modulo_concreto.Text <> "" And txt_fy_aco.Text <> "" And _
+               txt_comprimento_vao.Text <> "") Then
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.comprimento_vao = txt_comprimento_vao.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.altura_total = txt_altura.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.altura_util = txt_altura_util.Text
+
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.largura_maior = txt_largura.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.L = txt_comprimento_vao.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.fck = txt_fck.Text
+            Modulo_Calculo_Secao_Retangular_Estadio1.ftk = txt_ftk.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.Ec = txt_modulo_concreto.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.aco_compressao = txt_aco_compressao.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.aco_tracao = txt_aco_tracao.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio1.Es = txt_modulo_aco.Text
+
+            Modulo_Calculo_Secao_Retangular_Estadio3.fy = txt_fy_aco.Text
+
+            My.Forms.frm_Resultado.txt_resultado_LN.Text = Format(Funcao_LN_Estadio1(), "####.00000")
+
+            My.Forms.frm_Resultado.txt_resultado_deformacao_tracao_concreto.Text = Format(Funcao_etp_Rec_Estadio1(), "####.0000000000")
+
+            My.Forms.frm_Resultado.txt_resultado_compressao_concreto.Text = Format(Funcao_ecm_Rec_Estadio1(), "####.00000")
+
+            My.Forms.frm_Resultado.txt_resultado_compressao_maxima_concreto.Text = Format(Funcao_ecp_Rec_Estadio1(), "####.0000000000")
+
+            My.Forms.frm_Resultado.txt_resultado_Aco_compressao.Text = Format(Funcao_es1_Rec_Estadio1(), "####.0000000000")
+
+            My.Forms.frm_Resultado.txt_resultado_aco_tracao.Text = Format(Funcao_es2_Rec_Estadio1(), "####.0000000000")
+
+            My.Forms.frm_Resultado.txt_resultado_momento_fissuracao.Text = Format(Funcao_Momento_Rec_Estadio1(), "####.00000")
+
+            ' Inicio ao comando For. Para isso, precisamos iniciar o valor de deformacao_compressao_variavel_concreto_Estadio2. Ele inicia o com o valor de deformacao
+            ' de compressao final encontrado no estadio 1
+
+            For x As Int64 = 1 To 2 Step 1
+
+                'ESTADIO 1
+
+                If My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count = 0 Then
+
+                    ' add primeira linha 
+
+                    My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add("0", "Regime Linear (Estadio 1)", _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1(), "####.00000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1(), "####.0000000000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_etp_Rec_Estadio1(), "####.0000000000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_es1_Rec_Estadio1(), "####.0000000000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_es2_Rec_Estadio1, "####.0000000000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1(), "####.00000"), _
+                                                                       Format(Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Deflexao_Estadio1(), "####.0000000000"))
+
+                    'ESTADIO 2
+
+                Else
+
+                    ecm_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1()
+
+                    For i As Int64 = 1 To 100000 Step 1   ' Nao se sabe quantos passos terao, apenas a extrapolei para 1000 'for' 
+
+                        'Cálculos
+
+                        fy_compressao_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es1_Estadio2() * Es
+
+                        fy_tracao_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es2_Estadio2() * Es
+
+                        ecm_variavel_estadio2 = ecm_variavel_estadio2 * 1.01 ' ACRESCENTAR 1% EM CIMA DO ENCREMENTO FEITO
+
+                        LN = Funcao_LN_Estadio2()
+
+                        momento_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_Momento_Estadio2()
+
+                        etm_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_etm_Rec_Estadio2()
+
+                        es1_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es1_Estadio2()
+
+                        es2_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es2_Estadio2()
+
+                        'VERIFICACAO DO ACO
+
+                        If fy_compressao_estadio2 > txt_fy_aco.Text Then
+
+                            Exit For
+
+                        Else
+
+                            es1_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es1_Estadio2()
+
+                        End If
+
+                        If fy_tracao_estadio2 > txt_fy_aco.Text Then
+
+                            Exit For
+
+                        Else
+
+                            es2_variavel_estadio2 = Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_es2_Estadio2()
+
+                        End If
+
+                        'VARIFICACAO DO CONCRETO
+
+                        If (etm_variavel_estadio2 <= Modulo_Calculo_Secao_Retangular_Estadio2.Funcao_etf_Rec_Estadio2) Then
+
+
+                            ' PRIMEIRA VERIFICAÇÃO QUANTO AO MOMENTO: 3Mi/4 MENOR QUE O MOMENTO DE FISSURAÇÃO
+
+                            If 3 * momento_variavel_estadio2 / 4 <= Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+
+                                deflexao_estadio2 = ((comprimento_vao ^ 2) / 48) * ((3 * momento_variavel_estadio2 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / (Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + (ecm_variavel_estadio2 / LN))
+
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(i, "Regime Nao Linear (Estadio 2)-1", _
+                                                                               Format(LN, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio2, "####.00000"), _
+                                                                               Format(deflexao_estadio2, "####.0000000000"))
+
+                                'SEGUNDA VERIFICAÇÃO QUANTO AO MOMENTO: 3Mi/4 MAIOR QUE O MEOMENTO DE FISSURACAO E Mi/2 MENOR 
+
+
+                            ElseIf 3 * momento_variavel_estadio2 / 4 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 And _
+                            momento_variavel_estadio2 / 2 < Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(i, "Regime Nao Linear (Estadio 2)-2", _
+                                                                               Format(LN, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio2, "####.00000"), _
+                                                                               "0")
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * 3 * momento_variavel_estadio2 / 4 _
+                                    And My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio2 / 4) Then  'verifica a condição do valor do momento na coluna momento
+
+                                        ecm_resultado_parte1_estadio2 = My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte1_estadio2 = My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+
+                                        deflexao_estadio2 = ((comprimento_vao ^ 2) / 48) * _
+            ((3 * momento_variavel_estadio2 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / _
+            (4 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + _
+            (3 * ecm_resultado_parte1_estadio2 / LN_resultado_parte1_estadio2) + _
+                                       (ecm_variavel_estadio2 / LN))
+
+                                        'ADD
+                                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio2, "####.0000000000")
+
+                                        Exit For
+
+                                    End If
+
+                                Next
+
+                                ' TERCEIRA VERIFICAÇÃO QUANTO AO MOMENTO: Mi/2 MAIOR QUE O MOMENTO DE FISSURACAO E Mi/4 MENOR
+
+
+                            ElseIf momento_variavel_estadio2 / 2 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 And _
+                            momento_variavel_estadio2 / 4 < Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(i, "Regime Nao Linear (Estadio 2)-3", _
+                                                                               Format(LN, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio2, "####.00000"), _
+                                                                               "0")
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * 3 * momento_variavel_estadio2 / 4 _
+                                    And My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio2 / 4) Then
+
+                                        ecm_resultado_parte1_estadio2 = My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte1_estadio2 = My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                        Exit For
+                                    End If
+                                Next
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * momento_variavel_estadio2 / 2 _
+                                    And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio2 / 2) Then
+
+                                        ecm_resultado_parte2_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte2_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                        Exit For
+
+                                    End If
+
+                                Next
+
+
+
+                                deflexao_estadio2 = ((comprimento_vao ^ 2) / 48) * ((3 * momento_variavel_estadio2 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / _
+                                (4 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + _
+                                (3 * ecm_resultado_parte1_estadio2 / LN_resultado_parte1_estadio2) + _
+                                                                (ecm_variavel_estadio2 / LN))
+
+                                'ADD
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio2, "####.0000000000")
+
+
+
+                                'QUARTA VERIFICAÇÃO QUANTO AO MOMENTO: Mi/4 MAIOR QUE O MOMENTO DE FISSURACAO
+
+                            ElseIf momento_variavel_estadio2 / 4 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(i, "Regime Nao Linear (Estadio 2)-4", _
+                                                                               Format(LN, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio2, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio2, "####.00000"), _
+                                                                               "0")
+
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * 3 * momento_variavel_estadio2 / 4 _
+                                    And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio2 / 4) Then  'verifica a condição do valor do momento na coluna momento
+
+                                        ecm_resultado_parte1_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte1_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                        Exit For
+
+                                    End If
+
+                                Next
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * momento_variavel_estadio2 / 2 _
+                                    And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio2 / 2) Then
+
+                                        ecm_resultado_parte2_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte2_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                        Exit For
+
+                                    End If
+
+                                Next
+
+                                For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                                    If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * momento_variavel_estadio2 / 4 _
+                                    And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio2 / 4) Then
+
+                                        ecm_resultado_parte3_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                        LN_resultado_parte3_estadio2 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                        Exit For
+
+                                    End If
+
+                                Next
+
+
+                                deflexao_estadio2 = ((comprimento_vao ^ 2) / 48) * _
+                             ((ecm_resultado_parte3_estadio2 / LN_resultado_parte3_estadio2) + _
+     (ecm_resultado_parte2_estadio2 / LN_resultado_parte2_estadio2) + _
+     (3 * ecm_resultado_parte1_estadio2 / LN_resultado_parte1_estadio2) + _
+                                (ecm_variavel_estadio2 / LN))
+
+                                'ADD
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio2, "####.0000000000")
+
+
+                            End If
+
+                            ecm_variavel_estadio3 = ecm_variavel_estadio2
+
+                            es1_variavel_estadio3 = es1_variavel_estadio2
+
+                            es2_variavel_estadio3 = es2_variavel_estadio3
+
+                            i_final = i
+
+                        Else
+
+                            Exit For
+
+                        End If
+
+                    Next i
+
+                End If
+
+            Next x
+
+            ' PRESERVANDO OS VALORES
+
+            ecm_variavel_estadio3 = ecm_variavel_estadio2
+
+            es1_variavel_estadio3 = es1_variavel_estadio2
+
+            es2_variavel_estadio3 = es2_variavel_estadio3
+
+            momento_variavel_estadio3 = momento_variavel_estadio2
+
+
+            ' ESTADIO 3
+
+            'INICIANDO A CONTAGEM
+
+            For j As Int64 = i_final + 1 To 100000 Step 1
+
+                ecm_variavel_estadio3 = ecm_variavel_estadio3
+
+                etm_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_etm_Estadio3() ' Calcula a variacao da deformaçao de tracao do concreto 
+
+                fy_compressao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3() * Es ' Calcula a variacao da tensao no aco de compressao
+
+                fy_tracao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3() * Es ' Calcula a variacao da tensao no aco de tracao
+
+                es1_variavel_estadio3 = Funcao_es1_Estadio3() ' Calcula a variacao na deformacao do aco de compressao
+
+                es2_variavel_estadio3 = Funcao_es2_Estadio3() ' Calcula a variacao na deformacao do aco de tracao
+
+                momento_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_Momento_Estadio3()
+
+                ' VERIFICACAO DO ACO
+
+                If fy_tracao_estadio3 > txt_fy_aco.Text And fy_compressao_estadio3 > txt_fy_aco.Text Then  ' ACO TRAÇÃO E COMPRESSAO ESCOAM
+
+                    fy_tracao_estadio3 = fy
+
+                    es2_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3()
+
+                    fy_compressao_estadio3 = fy
+
+                    es1_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3()
+
+                    LN_variavel_estadio3 = Funcao_LN_Estadio3()
+
+                    momento_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_Momento_Estadio3()
+
+                ElseIf fy_tracao_estadio3 < txt_fy_aco.Text And fy_compressao_estadio3 > txt_fy_aco.Text Then  ' ACO TRACAO NÃO ESCOA E COMPRESSAO ESCOA
+
+                    es2_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3()
+
+                    fy_tracao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3() * Es
+
+                    fy_compressao_estadio3 = fy
+
+                    es1_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3()
+
+                    LN_variavel_estadio3 = Funcao_LN_Estadio3()
+
+                    momento_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_Momento_Estadio3()
+
+                ElseIf fy_tracao_estadio3 > txt_fy_aco.Text And fy_compressao_estadio3 < txt_fy_aco.Text Then  ' ACP TRACAO ESCOA E COMPRESSAO NAO ESCOA
+
+                    fy_tracao_estadio3 = fy
+
+                    es2_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3()
+
+                    es1_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3()
+
+                    fy_compressao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3 * Es
+
+                    LN_variavel_estadio3 = Funcao_LN_Estadio3()
+
+                    momento_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_Momento_Estadio3()
+
+                ElseIf fy_tracao_estadio3 < txt_fy_aco.Text And fy_compressao_estadio3 < txt_fy_aco.Text Then  ' ACO TRACAO E COMPRESSAO NAO ESCOAM
+
+                    es2_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3()
+
+                    fy_tracao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es2_Estadio3() * Es
+
+                    es1_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3()
+
+                    fy_compressao_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_es1_Estadio3 * Es
+
+                    LN_variavel_estadio3 = Funcao_LN_Estadio3()
+
+                    momento_variavel_estadio3 = Modulo_Calculo_Secao_Retangular_Estadio3.Funcao_Momento_Estadio3()
+
+                End If
+
+                ' VERIFICACAO DO CONCRETO
+
+                If ecm_variavel_estadio3 <= 3.5 * 0.001 Then
+
+                    '   PRIMEIRA VERIFICACAO
+
+                    If 3 * momento_variavel_estadio3 / 4 <= Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+
+                        deflexao_estadio3 = ((comprimento_vao ^ 2) / 48) * ( _
+(3 * momento_variavel_estadio3 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / (Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + (ecm_variavel_estadio3 / LN_estadio3))
+
+
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(j, "Regime Nao Linear (Estadio 3)-1", _
+                                                                                Format(LN_estadio3, "####.00000"), _
+                                                                                Format(ecm_variavel_estadio3, "####.0000000000"), _
+                                                                                Format(es1_variavel_estadio3, "####.0000000000"), _
+                                                                                Format(es2_variavel_estadio3, "####.0000000000"), _
+                                                                                Format(momento_variavel_estadio3, "####.00000"), _
+                                                                                Format(deflexao_estadio3, "####.00000000000"))
+
+                        '   SEGUNDA VERIFICACAO
+
+                    ElseIf 3 * momento_variavel_estadio3 / 4 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 And _
+                    momento_variavel_estadio3 / 2 < Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(j, "Regime Nao Linear (Estadio 3) - 2", _
+                                                                               Format(LN_estadio3, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio3, "####.00000"), _
+                                                                               "0")
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * (3 * momento_variavel_estadio3 / 4) And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio3 / 4) Then
+
+                                ecm_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+
+                                deflexao_estadio3 = ((comprimento_vao ^ 2) / 48) * ((3 * momento_variavel_estadio3 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / _
+                                (4 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + _
+                                (3 * ecm_resultado_parte1_estadio3 / LN_resultado_parte1_estadio3) + _
+                                                               (ecm_variavel_estadio3 / LN_estadio3))
+
+                                'ADD
+                                My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio3, "####.0000000000")
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+
+                        '   TERCEIRA VERIFICACAO
+
+                    ElseIf momento_variavel_estadio3 / 2 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 And _
+                    momento_variavel_estadio3 / 4 < Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(j, "Regime Nao Linear (Estadio 3) - 2", _
+                                                                               Format(LN_estadio3, "####.00000"), _
+                                                                               Format(ecm_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(es1_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(es2_variavel_estadio3, "####.0000000000"), _
+                                                                               Format(momento_variavel_estadio3, "####.00000"), _
+                                                                               "0")
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * (3 * momento_variavel_estadio3 / 4) And _
+                                                        frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio3 / 4) Then
+
+                                ecm_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * (momento_variavel_estadio3 / 2) And _
+                                                            frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio3 / 2) Then
+
+                                ecm_resultado_parte2_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte2_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+
+                        deflexao_estadio3 = ((comprimento_vao ^ 2) / 48) * _
+((momento_variavel_estadio3 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / (4 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1)) + _
+(3 * ecm_resultado_parte1_estadio3 / LN_resultado_parte1_estadio3) + _
+(ecm_resultado_parte2_estadio3 / LN_resultado_parte2_estadio3) + _
+                            (ecm_variavel_estadio3 / LN_estadio3))
+
+                        'ADD
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio3, "####.0000000000")
+
+
+                        '   QUARTA VERIFICACAO
+
+                    ElseIf momento_variavel_estadio3 / 4 > Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1 Then
+
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Add(j, "Regime Nao Linear (Estadio 3) - 4", _
+                                                                                   Format(LN_estadio3, "####.00000"), _
+                                                                                   Format(ecm_variavel_estadio3, "####.0000000000"), _
+                                                                                   Format(es1_variavel_estadio3, "####.0000000000"), _
+                                                                                   Format(es2_variavel_estadio3, "####.0000000000"), _
+                                                                                   Format(momento_variavel_estadio3, "####.00000"), _
+                                                                                   "0")
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * 3 * momento_variavel_estadio3 / 4 And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (3 * momento_variavel_estadio3 / 4) Then
+
+                                ecm_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte1_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * (momento_variavel_estadio3 / 2) And _
+                                                            frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio3 / 2) Then
+
+                                ecm_resultado_parte2_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte2_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+                        For a As Int64 = 0 To My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1 Step 1
+
+                            If frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() <= 1.01 * (momento_variavel_estadio3 / 4) And frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(6).Value.ToString() >= 0.99 * (momento_variavel_estadio3 / 4) Then
+
+                                ecm_resultado_parte3_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(3).Value.ToString()
+
+                                LN_resultado_parte3_estadio3 = frm_Resultado.DataGrid_Resultado_Estadio2.Rows(a).Cells(2).Value.ToString()
+
+
+                                Exit For
+
+                            End If
+
+                        Next
+
+
+                        ' calculando  deflexao
+                        deflexao_estadio3 = ((comprimento_vao ^ 2) / 48) * ((ecm_resultado_parte3_estadio3 / LN_resultado_parte3_estadio3) + _
+                        (ecm_resultado_parte2_estadio3 / LN_resultado_parte2_estadio3) + (3 * ecm_resultado_parte1_estadio3 / LN_resultado_parte1_estadio3) + _
+                                             (ecm_variavel_estadio3 / LN_estadio3))
+
+                        'ADD
+                        My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Item(My.Forms.frm_Resultado.DataGrid_Resultado_Estadio2.Rows.Count - 1).Cells(7).Value = Format(deflexao_estadio3, "####.0000000000")
+
+                    End If
+
+                    ecm_variavel_estadio3 = ecm_variavel_estadio3 * 1.01 ' ACRESCENTA EM 1% A DEFORMACAO
+
+                Else
+
+                    Exit For
+
+                End If
+
+            Next j
+
+
+            ' EXIBICAO DOS RESULTADOS
+
+            My.Forms.frm_Resultado.TabControl_Resultado.SelectedTab = frm_Resultado.tab_estadio1
+
+            frm_Resultado.Show()
+
+        End If
+
+
+    End Sub
+
+
+
+    ' -------------------------------------------------------------------------------------------------------------------------------------------
+
+    Private Sub Btn_Limpar_Rec_Click(sender As Object, e As EventArgs) Handles Btn_Limpar_Secao.Click
+
+        txt_fck.Text = ""
+        txt_ftk.Text = ""
+        txt_modulo_concreto.Text = ""
+        txt_comprimento_vao.Text = ""
+
+        txt_aco_compressao.Text = ""
+        txt_aco_tracao.Text = ""
+        txt_modulo_aco.Text = ""
+        txt_fy_aco.Text = ""
+
+        txt_altura.Text = ""
+        txt_altura_util.Text = ""
+        txt_largura.Text = ""
+        txt_largura.Text = ""
+
+    End Sub
+
+
+    Private Sub txt_altura_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_altura.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+    Private Sub txt_altura_util_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_altura_util.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_largura_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_largura.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+    Private Sub txt_comprimento_vao_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_comprimento_vao.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_fck_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_fck.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_ftk_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_ftk.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_modulo_concreto_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_modulo_concreto.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+    Private Sub txt_fy_aco_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_fy_aco.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+    Private Sub txt_aco_compressao_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_aco_compressao.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_aco_tracao_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_aco_tracao.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_modulo_aco_KeyPress(sender As Object, e As KeyPressEventArgs) Handles txt_modulo_aco.KeyPress
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+
+    Private Sub txt_escoamento_aco_KeyPress(sender As Object, e As KeyPressEventArgs)
+
+        '---Se o textbox esta vazio e o usuario pressionou um caractere decimal ---
+        If CType(sender, TextBox).Text = String.Empty And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+        End If
+
+        '---Se o textbox já possui um ponto decimal---
+        If CType(sender, TextBox).Text.Contains(Chr(44)) And e.KeyChar = Chr(44) Then
+            e.Handled = True
+            Return
+
+        End If
+
+        '---se a tecla pressionada não é um número decimal valido ---
+        If (Not (Char.IsDigit(e.KeyChar) Or Char.IsControl(e.KeyChar) Or (e.KeyChar = Chr(44)))) Then
+            e.Handled = True
+        End If
+
+    End Sub
+
+    Private Sub txt_intervalo_KeyPress(sender As Object, e As KeyPressEventArgs)
+
+        If Not (Char.IsDigit(e.KeyChar) OrElse Char.IsControl(e.KeyChar)) Then
+
+            e.Handled = True
+
+        End If
+
+    End Sub
+
+End Class
+
+
+ 
+' RESULTADO
+
+Imports System.Windows.Forms.DataVisualization.Charting
+Imports Microsoft.Office.Interop
+
+Public Class frm_Resultado
+
+    Public eixo_ecm_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1}
+
+    Public eixo_momento_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Momento_Rec_Estadio1}
+
+    Public eixo_es1_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_es1_Rec_Estadio1}
+
+    Public eixo_es2_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_es2_Rec_Estadio1}
+
+    Public eixo_etm_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_etm_Rec_Estadio1}
+
+    Public eixo_LN_estadio1() As Double = {altura_total, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_LN_Estadio1}
+
+    Public eixo_deflexao_estadio1() As Double = {0, Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_Deflexao_Estadio1}
+
+    Public QtdTotaLinha As Int64 = 0
+
+    Private Sub frm_Resultado_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Me.txt_resultado_Aco_compressao.Enabled = False
+        Me.txt_resultado_aco_tracao.Enabled = False
+        Me.txt_resultado_compressao_concreto.Enabled = False
+        Me.txt_resultado_compressao_maxima_concreto.Enabled = False
+        Me.txt_resultado_deformacao_tracao_concreto.Enabled = False
+        Me.txt_resultado_LN.Enabled = False
+        Me.txt_resultado_momento_fissuracao.Enabled = False
+
+    End Sub
+
+    Private Sub ExportarParaExcelToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles ExportarParaExcelToolStripMenuItem.Click
+
+        Me.ExportarParaExcel()
+
+    End Sub
+
+    Private Sub ExportarParaExcel()
+        Dim xlApp As Excel.Application = New Excel.Application
+        Dim xlWorkBook As Excel.Workbook
+        Dim xlWorkSheet As Excel.Worksheet
+        Dim misValue As Object = System.Reflection.Missing.Value
+
+        xlWorkBook = xlApp.Workbooks.Add(misValue)
+        xlWorkSheet = xlWorkBook.Sheets("Plan1")
+        With xlWorkSheet
+
+            'Titulo das colunas
+
+            .Cells(1, 1) = "índice i"
+            .Cells(1, 2) = "Tipo de Regime"
+            .Cells(1, 3) = "Linha Neutra (cm)"
+            .Cells(1, 4) = "Deformação Compressão do Concreto (por mil)"
+            .Cells(1, 5) = "Deformação Compressão do Aço (por mil)"
+            .Cells(1, 6) = "Deformação Tração do Aço (por mil)"
+            .Cells(1, 7) = "Momento (kN.m)"
+            .Cells(1, 8) = "Deflexão (cm)"
+
+            'Titulo das colunas em negrito
+
+            .Range("A1", "A1").Font.Bold = True
+            .Range("B1", "B1").Font.Bold = True
+            .Range("C1", "C1").Font.Bold = True
+            .Range("D1", "D1").Font.Bold = True
+            .Range("E1", "E1").Font.Bold = True
+            .Range("F1", "F1").Font.Bold = True
+            .Range("G1", "G1").Font.Bold = True
+            .Range("H1", "H1").Font.Bold = True
+
+        End With
+
+        For linha As Integer = 0 To DataGrid_Resultado_Estadio2.Rows.Count - 1
+            For coluna As Integer = 0 To DataGrid_Resultado_Estadio2.Columns.Count - 1
+                xlWorkSheet.Cells(linha + 2, coluna + 1) = DataGrid_Resultado_Estadio2.Rows(linha).Cells(coluna).Value
+            Next
+        Next
+
+        xlApp.Visible = True
+
+        'xlWorkBook.SaveAs("Resultado_AlfaMCV")
+        'xlWorkBook.Close()
+        'xlApp.Quit()
+
+        'MessageBox.Show("Arquivo Tabela_Resultados_AlfaMCV.xlsx criado com sucesso!", _
+        '                "AlfaMCV")
+    End Sub
+End Class 
+Imports System.Math
+
+Module Modulo_Calculo_Secao_Retangular_Estadio1
+
+    'VARIAVEIS CONCRETO
+
+    Public fck As Double
+    Public ftk As Double
+    Public Ec As Double
+    Public etm As Double
+    Public ecm As Double
+    Public ecp As Double
+    Public L As Double
+    Public deflexao_estadio1 As Double
+    Public comprimento_vao As Double
+
+    'VARIAVEIS AÇO
+
+    Public aco_compressao As Double
+    Public aco_tracao As Double
+    Public Es As Double
+    Public es2_estadio1 As Double
+    Public es1_estadio1 As Double
+
+    'VARIAVEIS SECAO
+
+    Public altura_total As Double
+    Public altura_util As Double
+    Public largura_maior As Double
+
+    'VARIAVEL LN
+
+    Public LN_estadio1 As Double
+
+    'VARIAVEIS COEFICIENTES
+
+    Public A_estadio1 As Double
+    Public B_estadio1 As Double
+    Public Q_estadio1 As Double
+
+    Public k1_estadio1 As Double
+    Public k1_estadio1_parte1 As Double
+    Public k1_estadio1_parte2 As Double
+
+    Public k2_estadio1 As Double
+    Public k2_estadio1_parte1 As Double
+    Public k2_estadio1_parte2 As Double
+    Public k2_estadio1_parte3 As Double
+    Public k2_estadio1_parte4 As Double
+
+    Public k3_estadio1 As Double
+
+    Public k4_estadio1 As Double
+
+    'VARIAVEL MOMENTO
+
+    Public momento_estadio1 As Double
+    Public momento_linear_estadio1 As Double
+
+    ' CALCULO DEFORMACOES
+
+    Function Funcao_etp_Rec_Estadio1() As Double
+
+        etm = ftk / Ec
+
+        Return etm
+
+    End Function
+
+
+    Function Funcao_ecm_Rec_Estadio1() As Double
+
+        ecm = Funcao_etp_Rec_Estadio1() * Funcao_LN_Estadio1() / _
+            (altura_total - Funcao_LN_Estadio1())
+
+        Return ecm
+
+    End Function
+
+
+    Function Funcao_etm_Rec_Estadio1() As Double
+
+        etm = (altura_total - Funcao_LN_Estadio1()) * Funcao_ecm_Rec_Estadio1() / Funcao_LN_Estadio1()
+
+        Return etm
+
+    End Function
+
+
+    Function Funcao_es2_Rec_Estadio1() As Double
+
+        es2_estadio1 = (altura_util - Funcao_LN_Estadio1()) * Funcao_etp_Rec_Estadio1() / _
+                        (altura_total - Funcao_LN_Estadio1())
+
+        Return es2_estadio1
+
+    End Function
+
+
+    Function Funcao_es1_Rec_Estadio1() As Double
+
+        If frm_Calcula_Secao.txt_aco_compressao.Text > 0 Then
+
+            es1_estadio1 = (Funcao_LN_Estadio1() - _
+            (altura_total - altura_util)) * Funcao_etp_Rec_Estadio1() / _
+            (altura_total - Funcao_LN_Estadio1())
+
+        Else
+
+            es1_estadio1 = 0
+
+        End If
+
+        Return es1_estadio1
+
+    End Function
+
+
+    Function Funcao_ecp_Rec_Estadio1() As Double
+
+        ecp = 2 * fck / Ec
+
+        Return ecp
+
+    End Function
+
+
+    ' COEFICIENTES A, B, Q, K1, K2, K3, K4
+
+    Function Funcao_A_Rec_Estadio1() As Double
+
+        A_estadio1 = ((Ec * Funcao_ecp_Rec_Estadio1() / fck) - 2) / Funcao_ecp_Rec_Estadio1()
+
+        Return A_estadio1
+
+    End Function
+
+
+    Function Funcao_B_Rec_Estadio1() As Double
+
+        B_estadio1 = 1 / (Funcao_ecp_Rec_Estadio1() ^ 2)
+
+        Return B_estadio1
+
+    End Function
+
+
+    Function Funcao_Q_rec_Estadio1() As Double
+
+        Q_estadio1 = 4 * Funcao_B_Rec_Estadio1() - Funcao_A_Rec_Estadio1() * Funcao_A_Rec_Estadio1()
+
+        Return Q_estadio1
+
+    End Function
+
+
+    Function Funcao_k1_Rec_Estadio1() As Double
+
+        k1_estadio1_parte1 = (0.5 / Funcao_B_Rec_Estadio1()) * _
+        (Math.Log(1 + Funcao_A_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() + _
+ Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1()))
+
+
+        k1_estadio1_parte2 = (Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() * Math.Sqrt(Funcao_Q_rec_Estadio1))) * _
+                (Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1)) -
+                Math.Atan((Funcao_A_Rec_Estadio1() + _
+                2 * Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1()) / _
+                Math.Sqrt(Funcao_Q_rec_Estadio1)))
+
+        k1_estadio1 = (Ec / (fck * Funcao_ecm_Rec_Estadio1())) * (k1_estadio1_parte1 + k1_estadio1_parte2)
+
+
+        Return k1_estadio1
+
+    End Function
+
+
+    Function Funcao_k2_Rec_Estadio1() As Double
+
+        k2_estadio1_parte1 = (Funcao_A_Rec_Estadio1() * 0.5 / (Funcao_B_Rec_Estadio1() * Funcao_B_Rec_Estadio1())) * _
+        Math.Log(1 + Funcao_A_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() + Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1())
+
+        k2_estadio1_parte2 = ((Funcao_A_Rec_Estadio1() * Funcao_A_Rec_Estadio1() - 2 * Funcao_B_Rec_Estadio1()) / _
+        (Funcao_B_Rec_Estadio1() * Funcao_B_Rec_Estadio1() * Math.Sqrt(Funcao_Q_rec_Estadio1))) * _
+        (Math.Atan((2 * Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() + Funcao_A_Rec_Estadio1()) / Math.Sqrt(Funcao_Q_rec_Estadio1)) - _
+                Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1)))
+
+        k2_estadio1_parte3 = (0.5 / Funcao_B_Rec_Estadio1()) * _
+        (Math.Log(1 + Funcao_A_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() + _
+Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1()))
+
+        k2_estadio1_parte4 = (Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() * Math.Sqrt(Funcao_Q_rec_Estadio1))) * _
+        (Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1)) -
+        Math.Atan((Funcao_A_Rec_Estadio1() + 2 * Funcao_B_Rec_Estadio1() * Funcao_ecm_Rec_Estadio1()) / Math.Sqrt(Funcao_Q_rec_Estadio1)))
+
+        k2_estadio1 = 1 - (((Funcao_ecm_Rec_Estadio1() / Funcao_B_Rec_Estadio1()) - k2_estadio1_parte1 + k2_estadio1_parte2) / (Funcao_ecm_Rec_Estadio1() * (k2_estadio1_parte3 + k2_estadio1_parte4)))
+
+        Return k2_estadio1
+
+    End Function
+
+
+    Function Funcao_k3_Rec_Estadio1() As Double
+
+        k3_estadio1 = Ec * Funcao_etp_Rec_Estadio1() / (2 * ftk)
+
+        Return k3_estadio1
+
+    End Function
+
+
+    Function Funcao_k4_Rec_Estadio1() As Double
+
+        k4_estadio1 = 1 / 3
+
+        Return k4_estadio1
+
+    End Function
+
+
+
+    ' CALCULOS SECAO ESTADIO 1 
+
+
+    ' CALCULO LN 
+
+    Function Funcao_LN_Estadio1() As Double
+
+        LN_estadio1 = (2 * (Es / Ec) * (altura_util * (aco_tracao - aco_compressao) + altura_total * aco_compressao) + _
+                largura_maior * altura_total * altura_total) / _
+          (2 * (altura_total * largura_maior + (Es / Ec) * aco_tracao + (Es / Ec) * aco_compressao))
+
+        Return LN_estadio1
+
+    End Function
+
+
+    ' CALCULO MOMENTO
+
+    Function Funcao_Momento_Rec_Estadio1() As Double
+
+        momento_estadio1 = Funcao_k1_Rec_Estadio1() * fck * largura_maior * 10 * Funcao_LN_Estadio1() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Rec_Estadio1() * Funcao_LN_Estadio1() * 10) + _
+        Funcao_es2_Rec_Estadio1() * Es * aco_tracao * 100 * (altura_util * 10 - altura_total * 0.5 * 10) + _
+        Funcao_es1_Rec_Estadio1() * Es * aco_compressao * 100 * (altura_util * 10 - altura_total * 0.5 * 10) + _
+        Funcao_k3_Rec_Estadio1() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio1() * 10) * (altura_total * 0.5 * 10 - Funcao_k4_Rec_Estadio1() * (altura_total * 10 - Funcao_LN_Estadio1() * 10))
+
+        Return momento_estadio1 * 0.000001
+
+    End Function
+
+    ' CALCULO DEFLEXAO
+
+    Function Funcao_Deflexao_Estadio1() As Double
+
+        deflexao_estadio1 = (comprimento_vao ^ 2) * Modulo_Calculo_Secao_Retangular_Estadio1.Funcao_ecm_Rec_Estadio1 / (12 * Funcao_LN_Estadio1())
+
+        Return deflexao_estadio1
+
+    End Function
+
+
+    ' FIM CALCULOS SECAO ESTADIO 1 
+
+End Module
+ 
+Imports System.Math
+
+Module Modulo_Calculo_Secao_Retangular_Estadio2
+
+
+    'VARIAVEL LN
+    Public LN_estadio2 As Double
+    Public LN_estadio2_parte1 As Double
+    Public LN_estadio2_parte2 As Double
+    Public LN_estadio2_parte3 As Double
+    Public LN_resultado_parte1_estadio2 As Double
+    Public LN_resultado_parte2_estadio2 As Double
+    Public LN_resultado_parte3_estadio2 As Double
+    Public LN As Double ' Essa é a variavel 
+
+    Public i As Double
+
+    'VARIAVEIS AÇO
+    Public es1_estadio2 As Double
+    Public es2_estadio2 As Double
+    Public es1_variavel_estadio2 As Double
+    Public es2_variavel_estadio2 As Double
+    Public fy_compressao_estadio2 As Double
+    Public fy_tracao_estadio2 As Double
+
+    'VARIAVEIS CONCRETO
+    Public Et As Double
+    Public ecm_variavel_estadio2 As Double
+    Public ecm_estadio2 As Double
+    Public ecm_final_estadio2 As Double
+    Public ecm_resultado_parte1_estadio2 As Double
+    Public ecm_resultado_parte2_estadio2 As Double
+    Public ecm_resultado_parte3_estadio2 As Double
+    Public etp As Double
+    Public etf As Double
+    Public etm_estadio2 As Double
+    Public etm_variavel_estadio2 As Double
+    Public deflexao_estadio2 As Double
+    Public deflexao_variavel_estadio2 As Double
+
+    'VARIAVEIS COEFICIENTES
+    Public k1_estadio2 As Double
+    Public k1_estadio2_parte1 As Double
+    Public k1_estadio2_parte2 As Double
+
+    Public k2_estadio2 As Double
+    Public k2_estadio2_parte1 As Double
+    Public k2_estadio2_parte2 As Double
+    Public k2_estadio2_parte3 As Double
+    Public k2_estadio2_parte4 As Double
+
+    Public k3_estadio2 As Double
+
+    Public k4_estadio2 As Double
+    Public k4_estadio2_parte1 As Double
+    Public k4_estadio2_parte2 As Double
+
+    'VARIAVEL MOMENTO 
+    Public momento_estadio2 As Double
+    Public momento_variavel_estadio2 As Double
+
+    ' CALCULO MODULO 
+
+    Function Funcao_Et_Estadio2() As Double
+
+        Et = (70 * Ec * (1000000 / 6895) / (57 + ftk * (1000000 / 6895))) * (6895 / 1000000)
+
+        Return Et
+
+    End Function
+
+
+    ' CALCULO DEFORMACOES 
+
+    Function Funcao_etp_Rec_Estadio2() As Double
+
+        etp = ftk / Ec
+
+        Return etp
+
+    End Function
+
+
+    Function Funcao_etf_Rec_Estadio2() As Double
+
+        etf = (ftk / Funcao_Et_Estadio2()) + Funcao_etp_Rec_Estadio2()
+
+        Return etf
+
+    End Function
+
+
+    Function Funcao_ecm_Rec_Estadio2() As Double
+
+        ecm_estadio2 = Funcao_LN_Estadio2() * Funcao_etp_Rec_Estadio2() / (altura_total - Funcao_LN_Estadio2())
+
+        Return ecm_estadio2
+
+    End Function
+
+
+    Function Funcao_etm_Rec_Estadio2() As Double
+
+        etm_estadio2 = (altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / Funcao_LN_Estadio2()
+
+        Return etm_estadio2
+
+    End Function
+
+
+    Function Funcao_ecm_Final_Rec_Estadio2() As Double
+
+        ecm_final_estadio2 = Funcao_LN_Estadio2() * Funcao_etf_Rec_Estadio2() / (altura_total - Funcao_LN_Estadio2())
+
+        Return ecm_final_estadio2
+
+    End Function
+
+
+    Function Funcao_es1_Estadio2() As Double
+
+        If aco_compressao = 0 Then
+
+            es1_estadio2 = 0
+
+        Else
+
+            es1_estadio2 = (Funcao_LN_Estadio2() - altura_total + altura_util) * ecm_variavel_estadio2 / Funcao_LN_Estadio2()
+
+        End If
+
+        Return es1_estadio2
+
+    End Function
+
+
+    Function Funcao_es2_Estadio2() As Double
+
+        es2_estadio2 = (altura_util - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / Funcao_LN_Estadio2()
+
+        Return es2_estadio2
+
+    End Function
+
+    ' CALCULO COEFICIENTES K1, K2, K3, K4 
+
+    Function Funcao_k1_Estadio2() As Double
+
+        k1_estadio2_parte1 = (0.5 / Funcao_B_Rec_Estadio1()) * (Math.Log(1 + Funcao_A_Rec_Estadio1() * ecm_variavel_estadio2 + _
+                Funcao_B_Rec_Estadio1() * ecm_variavel_estadio2 * ecm_variavel_estadio2))
+
+        k1_estadio2_parte2 = (Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() * Math.Sqrt(Funcao_Q_rec_Estadio1))) * _
+        (Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1)) - Math.Atan((Funcao_A_Rec_Estadio1() + 2 * Funcao_B_Rec_Estadio1() * ecm_variavel_estadio2) / _
+                Math.Sqrt(Funcao_Q_rec_Estadio1)))
+
+        k1_estadio2 = (Ec / (fck * ecm_variavel_estadio2)) * (k1_estadio2_parte1 + k1_estadio2_parte2)
+
+        Return k1_estadio2
+
+    End Function
+
+
+    Function Funcao_k2_Estadio2() As Double
+
+        k2_estadio2_parte1 = (ecm_variavel_estadio2 / Funcao_B_Rec_Estadio1()) - (0.5 * Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() ^ 2)) * _
+        Math.Log(1 + Funcao_A_Rec_Estadio1() * ecm_variavel_estadio2 + Funcao_B_Rec_Estadio1() * (ecm_variavel_estadio2 ^ 2)) + _
+        (Funcao_A_Rec_Estadio1() ^ 2 - 2 * Funcao_B_Rec_Estadio1()) * (Math.Atan((2 * Funcao_B_Rec_Estadio1() * ecm_variavel_estadio2 + Funcao_A_Rec_Estadio1()) / _
+        Math.Sqrt(Funcao_Q_rec_Estadio1)) - Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1))) / _
+                       (Funcao_B_Rec_Estadio1() ^ 2 * Math.Sqrt(Funcao_Q_rec_Estadio1))
+
+        k2_estadio2_parte2 = Funcao_k1_Estadio2() * (ecm_variavel_estadio2 ^ 2) * fck / Ec
+
+        k2_estadio2 = 1 - (k2_estadio2_parte1 / k2_estadio2_parte2)
+
+        Return k2_estadio2
+
+    End Function
+
+
+    Function Funcao_k3_Estadio2() As Double
+
+        k3_estadio2 = ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * (altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2()) - _
+        0.5 * Funcao_Et_Estadio2() * (((altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2())) ^ 2) - _
+        0.5 * ftk * Funcao_etp_Rec_Estadio2() - 0.5 * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 2)) / _
+        (ftk * (altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2()))
+
+        Return k3_estadio2
+
+    End Function
+
+
+    Function Funcao_k4_Estadio2() As Double
+
+        k4_estadio2_parte1 = -(1 / 6) * ftk * (Funcao_etp_Rec_Estadio2() ^ 2) + (0.5 * ftk + 0.5 * Funcao_Et_Estadio2() * Funcao_etp_Rec_Estadio2()) _
+        * (((altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2())) ^ 2) - _
+        (1 / 3) * Funcao_Et_Estadio2() * (((altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2())) ^ 3) - _
+                (1 / 6) * Funcao_Et_Estadio2() * ((Funcao_etp_Rec_Estadio2()) ^ 3)
+
+        k4_estadio2_parte2 = Funcao_k3_Estadio2() * _
+(((altura_total - Funcao_LN_Estadio2()) * ecm_variavel_estadio2 / (Funcao_LN_Estadio2())) ^ 2) * ftk
+
+        k4_estadio2 = 1 - (k4_estadio2_parte1 / k4_estadio2_parte2)
+
+        Return k4_estadio2
+
+    End Function
+
+
+    ' CALCULO LN 
+
+    Function Funcao_LN_Estadio2() As Double
+
+        LN_estadio2_parte1 = (ecm_variavel_estadio2 * Es * (aco_compressao + aco_tracao) - _
+        largura_maior * altura_total * (ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) - _
+        Funcao_Et_Estadio2() * largura_maior * altura_total * ecm_variavel_estadio2)
+
+        LN_estadio2_parte2 = (ecm_variavel_estadio2 * Es * ((altura_total - altura_util) * aco_compressao + altura_util * aco_tracao) _
+        - 0.5 * altura_total * altura_total * Funcao_Et_Estadio2() * largura_maior * ecm_variavel_estadio2)
+
+        LN_estadio2_parte3 = ((Funcao_k1_Estadio2() * fck * largura_maior + _
+largura_maior * (ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) + 0.5 * Funcao_Et_Estadio2() * largura_maior * ecm_variavel_estadio2 - _
+       largura_maior * (-0.5 * ftk * Funcao_etp_Rec_Estadio2() - _
+       0.5 * Funcao_Et_Estadio2() * Funcao_etp_Rec_Estadio2() * _
+       Funcao_etp_Rec_Estadio2()) / ecm_variavel_estadio2))
+
+        LN_estadio2 = (-LN_estadio2_parte1 + _
+Math.Sqrt(LN_estadio2_parte1 * LN_estadio2_parte1 + 4 * LN_estadio2_parte2 * LN_estadio2_parte3)) / _
+       (2 * LN_estadio2_parte3)
+
+        Return LN_estadio2
+
+    End Function
+
+    ' CALCULO MOMENTO ESTADIO 2 
+
+    Function Funcao_Momento_Estadio2() As Double
+
+        'O momento depende da LN, K1, K2, K3, K4
+
+        momento_estadio2 = Funcao_k1_Estadio2() * fck * largura_maior * 10 * Funcao_LN_Estadio2() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Estadio2() * Funcao_LN_Estadio2() * 10) +
+        Funcao_es1_Estadio2() * Es * aco_compressao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+        Funcao_es2_Estadio2() * Es * aco_tracao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+        Funcao_k3_Estadio2() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio2() * 10) * _
+        (altura_total * 0.5 * 10 - Funcao_k4_Estadio2() * (altura_total * 10 - Funcao_LN_Estadio2() * 10))
+
+        Return momento_estadio2 * 0.000001
+
+    End Function
+
+    ' FIM CALCULOS SECAO ESTADIO 2 
+
+End Module
+ 
+Imports System.Math
+
+Module Modulo_Calculo_Secao_Retangular_Estadio3
+
+    'VARIAVEL
+    Public LN_variavel_estadio3 As Double
+
+    'VARIAVEL LN
+    Public LN_estadio3 As Double  ' esse é o X da funcao
+    Public LN_estadio3_parte1 As Double
+    Public LN_estadio3_parte2 As Double
+    Public LN_estadio3_parte3 As Double
+    Public LN_resultado_parte1_estadio3 As Double
+    Public LN_resultado_parte2_estadio3 As Double
+    Public LN_resultado_parte3_estadio3 As Double
+
+    'VARIAVEIS CONCRETO
+    Public ecm_variavel_estadio3 As Double
+    Public etm_variavel_estadio3 As Double
+    Public ecm_resultado_parte1_estadio3 As Double
+    Public ecm_resultado_parte2_estadio3 As Double
+    Public ecm_resultado_parte3_estadio3 As Double
+    Public etm_estadio3 As Double
+    Public deflexao_estadio3 As Double
+
+    'VARIAVEIS AÇO
+    Public es1_estadio3 As Double
+    Public es2_estadio3 As Double
+    Public es1_variavel_estadio3 As Double
+    Public es2_variavel_estadio3 As Double
+    Public fy_compressao_estadio3 As Double
+    Public fy_tracao_estadio3 As Double
+    Public fy As Double
+
+
+
+    'VARIAVEIS COEFICIENTES
+    Public k1_estadio3 As Double
+    Public k1_estadio3_parte1 As Double
+    Public k1_estadio3_parte2 As Double
+
+    Public k2_estadio3 As Double
+    Public k2_estadio3_parte1 As Double
+    Public k2_estadio3_parte2 As Double
+    Public k2_estadio3_parte3 As Double
+    Public k2_estadio3_parte4 As Double
+
+    Public k3_estadio3 As Double
+
+    Public k4_estadio3 As Double
+    Public k4_estadio3_parte1 As Double
+    Public k4_estadio3_parte2 As Double
+    Public k4_estadio3_parte3 As Double
+
+    'VARIAVEIS MOMENTO
+    Public momento_estadio3 As Double
+    Public momento_variavel_estadio3 As Double
+
+
+    ' DEFORMACOES 
+
+    Function Funcao_es1_Estadio3() As Double
+
+        If aco_compressao = 0 Then
+
+            es1_estadio3 = 0
+
+        Else
+
+            es1_estadio3 = (Funcao_LN_Estadio3() - altura_total + altura_util) * ecm_variavel_estadio3 / Funcao_LN_Estadio3()
+
+
+        End If
+
+        Return es1_estadio3
+
+    End Function
+
+
+    Function Funcao_es2_Estadio3() As Double
+
+        es2_estadio3 = (altura_util - Funcao_LN_Estadio3()) * ecm_variavel_estadio3 / Funcao_LN_Estadio3()
+
+        Return es2_estadio3
+
+    End Function
+
+
+    Function Funcao_etm_Estadio3() As Double
+
+        etm_estadio3 = (altura_total - Funcao_LN_Estadio3()) * ecm_variavel_estadio3 / Funcao_LN_Estadio3()
+
+        Return etm_estadio3
+
+    End Function
+
+
+    ' CALCULO COEFICIENTES K1, K2, K3, K4 
+
+    Function Funcao_k1_Estadio3() As Double
+
+        k1_estadio3_parte1 = (0.5 / Funcao_B_Rec_Estadio1()) * (Math.Log(1 + Funcao_A_Rec_Estadio1() * ecm_variavel_estadio3 + Funcao_B_Rec_Estadio1() * ecm_variavel_estadio3 * ecm_variavel_estadio3))
+
+        k1_estadio3_parte2 = (Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() * Math.Sqrt(Funcao_Q_rec_Estadio1))) * _
+        (Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1)) - Math.Atan((Funcao_A_Rec_Estadio1() + _
+        2 * Funcao_B_Rec_Estadio1() * ecm_variavel_estadio3) / Math.Sqrt(Funcao_Q_rec_Estadio1)))
+
+        k1_estadio3 = (Ec / (fck * ecm_variavel_estadio3)) * (k1_estadio3_parte1 + k1_estadio3_parte2)
+
+        Return k1_estadio3
+
+    End Function
+
+
+    Function Funcao_k2_Estadio3() As Double
+
+        k2_estadio3_parte1 = (ecm_variavel_estadio3 / Funcao_B_Rec_Estadio1()) - (0.5 * Funcao_A_Rec_Estadio1() / (Funcao_B_Rec_Estadio1() ^ 2)) * _
+        Math.Log(1 + Funcao_A_Rec_Estadio1() * ecm_variavel_estadio3 + Funcao_B_Rec_Estadio1() * (ecm_variavel_estadio3 ^ 2)) + _
+        ((Funcao_A_Rec_Estadio1() ^ 2) - 2 * Funcao_B_Rec_Estadio1()) * (Math.Atan((2 * Funcao_B_Rec_Estadio1() * ecm_variavel_estadio3 + Funcao_A_Rec_Estadio1()) / _
+        Math.Sqrt(Funcao_Q_rec_Estadio1)) - Math.Atan(Funcao_A_Rec_Estadio1() / Math.Sqrt(Funcao_Q_rec_Estadio1))) / _
+                ((Funcao_B_Rec_Estadio1() ^ 2) * Math.Sqrt(Funcao_Q_rec_Estadio1))
+
+
+        k2_estadio3_parte2 = Funcao_k1_Estadio3() * (ecm_variavel_estadio3 ^ 2) * fck / Ec
+
+        k2_estadio3 = 1 - (k2_estadio3_parte1 / k2_estadio3_parte2)
+
+        Return k2_estadio3
+
+    End Function
+
+
+    Function Funcao_k3_Estadio3() As Double
+
+        k3_estadio3 = ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * Funcao_etf_Rec_Estadio2() - 0.5 * Funcao_Et_Estadio2() * ((Funcao_etf_Rec_Estadio2()) ^ 2) - _
+        0.5 * ftk * Funcao_etp_Rec_Estadio2() - 0.5 * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 2)) / _
+                (ftk * Funcao_etm_Estadio3())
+
+        Return k3_estadio3
+
+    End Function
+
+
+    Function Funcao_k4_Estadio3() As Double
+
+        k4_estadio3_parte1 = (-(1 / 6) * ftk * Funcao_etp_Rec_Estadio2() * Funcao_etp_Rec_Estadio2()) + _
+        (0.5 * ftk + 0.5 * Funcao_Et_Estadio2() * Funcao_etp_Rec_Estadio2()) * (Funcao_etf_Rec_Estadio2() * Funcao_etf_Rec_Estadio2()) - _
+                (1 / 3) * Funcao_Et_Estadio2() * (Funcao_etf_Rec_Estadio2() ^ 3) - _
+                (1 / 6) * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 3)
+
+        k4_estadio3_parte2 = (Funcao_etm_Estadio3() ^ 2) * Funcao_k3_Estadio3() * ftk
+
+        k4_estadio3 = 1 - (k4_estadio3_parte1 / k4_estadio3_parte2)
+
+        Return k4_estadio3
+
+    End Function
+
+
+
+    '   CALCULO LN 
+
+
+    Function Funcao_LN_Estadio3() As Double
+
+        If fy_tracao_estadio3 < fy And fy_compressao_estadio3 < fy Then
+
+            LN_estadio3_parte1 = Funcao_k1_Estadio3() * fck * largura_maior - _
+(largura_maior / ecm_variavel_estadio3) * ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * Funcao_etf_Rec_Estadio2() - _
+              0.5 * Funcao_Et_Estadio2() * (Funcao_etf_Rec_Estadio2() ^ 2) - _
+              0.5 * ftk * Funcao_etp_Rec_Estadio2() - _
+              0.5 * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 2))
+
+            LN_estadio3_parte2 = ecm_variavel_estadio3 * Es * aco_compressao + ecm_variavel_estadio3 * Es * aco_tracao
+
+            LN_estadio3_parte3 = -(altura_total - altura_util) * ecm_variavel_estadio3 * Es * aco_compressao - altura_util * ecm_variavel_estadio3 * Es * aco_tracao
+
+            LN_estadio3 = (-LN_estadio3_parte2 + Math.Sqrt((LN_estadio3_parte2 ^ 2) - 4 * LN_estadio3_parte1 * LN_estadio3_parte3)) / (2 * LN_estadio3_parte1)
+
+
+        ElseIf fy_tracao_estadio3 < fy And fy_compressao_estadio3 > fy Then
+
+            LN_estadio3_parte1 = Funcao_k1_Estadio3() * fck * largura_maior - _
+ (largura_maior / ecm_variavel_estadio3) * ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * Funcao_etf_Rec_Estadio2() - _
+              0.5 * Funcao_Et_Estadio2() * (Funcao_etf_Rec_Estadio2() ^ 2) - _
+              0.5 * ftk * Funcao_etp_Rec_Estadio2() - _
+              0.5 * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 2))
+
+            LN_estadio3_parte2 = fy * aco_compressao + ecm_variavel_estadio3 * Es * aco_tracao
+
+            LN_estadio3_parte3 = -altura_util * Es * aco_tracao * ecm_variavel_estadio3
+
+            LN_estadio3 = (-LN_estadio3_parte2 + Math.Sqrt((LN_estadio3_parte2 ^ 2) - 4 * LN_estadio3_parte1 * LN_estadio3_parte3)) / (2 * LN_estadio3_parte1)
+
+
+        ElseIf fy_tracao_estadio3 > fy And fy_compressao_estadio3 < fy Then
+
+            LN_estadio3_parte1 = Funcao_k1_Estadio3() * fck * largura_maior - _
+(largura_maior / ecm_variavel_estadio3) * ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * Funcao_etf_Rec_Estadio2() - _
+0.5 * Funcao_Et_Estadio2() * (Funcao_etf_Rec_Estadio2() ^ 2) - _
+             0.5 * ftk * Funcao_etp_Rec_Estadio2() - _
+             0.5 * Funcao_Et_Estadio2() * (Funcao_etp_Rec_Estadio2() ^ 2))
+
+            LN_estadio3_parte2 = ecm_variavel_estadio3 * Es * aco_compressao - fy * aco_tracao
+
+            LN_estadio3_parte3 = -(altura_total - altura_util) * ecm_variavel_estadio3 * Es * aco_compressao
+
+            LN_estadio3 = (-LN_estadio3_parte2 + Math.Sqrt((LN_estadio3_parte2 ^ 2) - 4 * LN_estadio3_parte1 * LN_estadio3_parte3)) / (2 * LN_estadio3_parte1)
+
+
+        ElseIf fy_tracao_estadio3 > fy And fy_compressao_estadio3 > fy Then
+
+            LN_estadio3_parte1 = fy * aco_tracao - fy * aco_compressao
+
+            LN_estadio3_parte2 = Funcao_k1_Estadio3() * fck * largura_maior
+
+            LN_estadio3_parte3 = (largura_maior / ecm_variavel_estadio3) * ((ftk + Funcao_etp_Rec_Estadio2() * Funcao_Et_Estadio2()) * Funcao_etf_Rec_Estadio2() - _
+            0.5 * Funcao_Et_Estadio2() * Funcao_etf_Rec_Estadio2() * Funcao_etf_Rec_Estadio2() - _
+                        0.5 * ftk * Funcao_etp_Rec_Estadio2() - _
+            0.5 * Funcao_Et_Estadio2() * Funcao_etp_Rec_Estadio2() * Funcao_etp_Rec_Estadio2())
+
+            LN_estadio3 = LN_estadio3_parte1 / (LN_estadio3_parte2 - LN_estadio3_parte3)
+
+        End If
+
+        Return LN_estadio3
+
+    End Function
+
+    ' CALCULO MOMENTO ESTADIO 3 
+
+    Function Funcao_Momento_Estadio3() As Double
+
+        'O momento depende da LN, K1, K2, K3, K4
+
+        If es1_estadio3 * Es > fy And es2_estadio3 * Es > fy Then
+
+            momento_estadio3 = Funcao_k1_Estadio3() * fck * largura_maior * 10 * Funcao_LN_Estadio3() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Estadio3() * Funcao_LN_Estadio3() * 10) +
+            fy * aco_compressao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + fy * aco_tracao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + Funcao_k3_Estadio3() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio3() * 10) * _
+            (altura_total * 0.5 * 10 - Funcao_k4_Estadio3() * (altura_total * 10 - Funcao_LN_Estadio3() * 10))
+
+        ElseIf es1_estadio3 * Es > fy And es2_estadio3 * Es < fy Then
+
+            momento_estadio3 = Funcao_k1_Estadio3() * fck * largura_maior * 10 * Funcao_LN_Estadio3() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Estadio3() * Funcao_LN_Estadio3() * 10) +
+            fy * aco_compressao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + Es * Funcao_es2_Estadio3() * aco_tracao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+            Funcao_k3_Estadio3() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio3() * 10) * _
+            (altura_total * 0.5 * 10 - Funcao_k4_Estadio3() * (altura_total * 10 - Funcao_LN_Estadio3() * 10))
+
+        ElseIf es1_estadio3 * Es < fy And es2_estadio3 * Es > fy Then
+
+            momento_estadio3 = Funcao_k1_Estadio3() * fck * largura_maior * 10 * Funcao_LN_Estadio3() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Estadio3() * Funcao_LN_Estadio3() * 10) +
+            Es * Funcao_es1_Estadio3() * aco_compressao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+            fy * aco_tracao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + Funcao_k3_Estadio3() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio3() * 10) * _
+            (altura_total * 0.5 * 10 - Funcao_k4_Estadio3() * (altura_total * 10 - Funcao_LN_Estadio3() * 10))
+
+        ElseIf es1_estadio3 * Es < fy And es2_estadio3 * Es < fy Then
+
+            momento_estadio3 = Funcao_k1_Estadio3() * fck * largura_maior * 10 * Funcao_LN_Estadio3() * 10 * (altura_total * 0.5 * 10 - Funcao_k2_Estadio3() * Funcao_LN_Estadio3() * 10) +
+            Es * Funcao_es1_Estadio3() * aco_compressao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+            Es * Funcao_es2_Estadio3() * aco_tracao * 100 * (altura_util * 10 - 0.5 * altura_total * 10) + _
+            Funcao_k3_Estadio3() * ftk * largura_maior * 10 * (altura_total * 10 - Funcao_LN_Estadio3() * 10) * _
+            (altura_total * 0.5 * 10 - Funcao_k4_Estadio3() * (altura_total * 10 - Funcao_LN_Estadio3() * 10))
+
+        End If
+
+        Return momento_estadio3 * 0.000001
+
+    End Function
+
+    ' FIM CALCULOS SECAO ESTADIO 3 ----------------------------------------------------------------------------------------------------
+
+End Module
+
+
